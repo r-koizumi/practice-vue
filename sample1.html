@@ -1,0 +1,36 @@
+<script src="https://unpkg.com/vue" xmlns:v-on="http://www.w3.org/1999/xhtml"></script>
+
+<div id="app">
+    <ol>
+        <li v-for="todo in todos">
+            {{ todo.text }}
+        </li>
+    </ol>
+    <p>{{ message }}</p>
+    <button v-on:click="reverseMessage">Reverse Message</button>
+    <br>
+    <input type="text" v-model="message">
+</div>
+
+<script>
+    var app = new Vue({
+        // Vue オブジェクトの紐付け先セレクタ
+        el: '#app',
+        // プロパティ
+        data: {
+            todos: [
+                {text: 'C'},
+                {text: 'C++'},
+                {text: 'C#'},
+                {text: 'Vue'}
+            ],
+            message: 'Hello Vue.js!'
+        },
+        // メソッド
+        methods: {
+            reverseMessage: function() {
+                this.message = this.message.split('').reverse().join('')
+            }
+        }
+    })
+</script>
