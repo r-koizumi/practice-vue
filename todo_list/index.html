@@ -33,9 +33,15 @@
                 this.tasks.splice(removing_id, 1);
             },
             add: function () {
+                if (!this.hasNewTask()) {
+                    return
+                }
                 this.tasks.push({text: this.newTask});
                 this.newTask = '';
             },
+            hasNewTask: function() {
+                return this.newTask != '' && this.newTask != null
+            }
         }
     });
 </script>
