@@ -12,7 +12,7 @@
 <div id="todo_list">
     <ul class="group">
         <li class="card" v-for="task, index in tasks">
-            <span>{{ task.text }}</span>
+            <input v-model="task.text">
             <button v-on:click="complete(index)">完了</button>
         </li>
     </ul>
