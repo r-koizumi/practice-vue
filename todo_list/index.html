@@ -9,37 +9,62 @@
 <body>
 <div id="todo_list">
     <ul class="group">
-        <li class="card" v-for="task, index in tasks">
-            <input v-model="task.text">
-            <button v-on:click="complete(index)">完了</button>
-        </li>
+        <todo-item v-for="task in tasks" v-bind:task="task" v-on:remove="remove(task)"></todo-item>
     </ul>
-    <input type="text" v-model="newTask" @keyup.enter="add">
+    <input type="text" v-model="newTask" @keyup.enter="add" placeholder="input new task">
     <button v-on:click="add">追加</button>
 </div>
 </body>
 
 <script>
+    Vue.component('todo-item', {
+        template: `
+            <li>
+                {{ task.id }} - {{ task.text }}
+                <a href="#" v-on:click="remove">完了</a>
+            </li>
+        `,
+        props: ['task'],
+        methods: {
+            remove: function() {
+                // remove という名前でイベントを発行する
+                this.$emit('remove');
+            }
+        },
+    })
+
     let todoList = new Vue({
         el: '#todo_list',
         data: {
             newTask: '',
-            tasks: [],
+            tasks: [
+                {id: 1, text: 'task1', completed: false,},
+                {id: 2, text: 'task2', completed: false,},
+                {id: 3, text: 'task3', completed: false,},
+            ],
         },
         methods: {
-            complete: function (removing_id) {
-                this.tasks.splice(removing_id, 1);
-            },
             add: function () {
                 if (!this.hasNewTask()) {
-                    return
+                    return;
                 }
-                this.tasks.push({text: this.newTask});
+                const ids = this.tasks.map(x => x.id);
+                const nextId = Math.max.apply(null, ids.concat([1])) + 1; // 何もない時に 1 を初期値として渡す
+                this.tasks.push({
+                    id: nextId,
+                    text: this.newTask,
+                });
                 this.newTask = '';
             },
             hasNewTask: function() {
-                return this.newTask != '' && this.newTask != null
-            }
+                return this.newTask !== '' && this.newTask !== null;
+            },
+            remove: function (task) {
+                this.tasks.remove(task);
+            },
+            changeState: function (task) {
+                task.completed = !task.completed;
+            },
         }
     });
 </script>
