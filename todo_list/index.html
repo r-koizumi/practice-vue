@@ -16,15 +16,26 @@
 <body>
 <div id="todo_list">
     <ul class="group">
-        <todo-item v-for="task in tasks" v-bind:task="task" @remove="remove(task)"></todo-item>
+        <!-- メモ
+            @remove は todo-item の remove メソッドで発行したイベントをキャッチする
+
+            v-on は @ に省略できる
+            v-on:click = @click
+
+            v-bind は省略できる
+            v-bind:class = :class
+        -->
+        <todo-item v-for="task in tasks" :key="task.id" :task="task" @remove="remove(task)"></todo-item>
     </ul>
     <input type="text" v-model="newTask" @keyup.enter="add" placeholder="input new task">
-    <button v-on:click="add">追加</button>
+    <button @click="add">追加</button>
 </div>
 </body>
 <script>
     // カスタムディレクティブ
+    // 自由に名前をつけられる
     Vue.directive('focus', {
+        // DOM 挿入時に実行されるやつ
         inserted: function(el) {
             el.focus();
         }
@@ -36,17 +47,17 @@
             -> .stop でイベントの電波を抑止、 .prevent でデフォルトのイベントの動作を抑止
                 こういうのを ディレクティブフック という
             
-                @blur : フォーカスがはずれたときのイベント
+            @blur : フォーカスがはずれたときのイベント
          */
         template: `
             <li>
                 <input type="checkbox" v-model="task.completed">
-                <span v-bind:class="[task.completed ? 'completed-task' : '']">
+                <span :class="[task.completed ? 'completed-task' : '']">
                     {{ task.id }} - 
                     <form v-if="editMode" @submit.stop.prevent="fix">
                         <input v-model="task.text" @blur="fix" v-focus>
                     </form>
-                    <span v-else @click="editMode = true">{{ task.text }}</span>
+                    <span v-else @click="edit">{{ task.text }}</span>
                 </span>
                 <a href="#" @click="remove">削除</a>
             </li>
