@@ -4,32 +4,70 @@
     <meta charset="UTF-8">
     <script src="https://unpkg.com/vue"></script>
     <script src="../common/polyfills.js"></script>
+    <script src="../common/linq.min.js"></script>
     <title>ToDo リスト</title>
+    <style type="text/css">
+        .completed-task {
+            color: #777777;
+            text-decoration: line-through;
+        }
+    </style>
 </head>
 <body>
 <div id="todo_list">
     <ul class="group">
-        <todo-item v-for="task in tasks" v-bind:task="task" v-on:remove="remove(task)"></todo-item>
+        <todo-item v-for="task in tasks" v-bind:task="task" @remove="remove(task)"></todo-item>
     </ul>
     <input type="text" v-model="newTask" @keyup.enter="add" placeholder="input new task">
     <button v-on:click="add">追加</button>
 </div>
 </body>
-
 <script>
+    // カスタムディレクティブ
+    Vue.directive('focus', {
+        inserted: function(el) {
+            el.focus();
+        }
+    });
+
     Vue.component('todo-item', {
+        /* メモ
+            @submi.stop.prevent
+            -> .stop でイベントの電波を抑止、 .prevent でデフォルトのイベントの動作を抑止
+                こういうのを ディレクティブフック という
+            
+                @blur : フォーカスがはずれたときのイベント
+         */
         template: `
             <li>
-                {{ task.id }} - {{ task.text }}
-                <a href="#" v-on:click="remove">完了</a>
+                <input type="checkbox" v-model="task.completed">
+                <span v-bind:class="[task.completed ? 'completed-task' : '']">
+                    {{ task.id }} - 
+                    <form v-if="editMode" @submit.stop.prevent="fix">
+                        <input v-model="task.text" @blur="fix" v-focus>
+                    </form>
+                    <span v-else @click="editMode = true">{{ task.text }}</span>
+                </span>
+                <a href="#" @click="remove">削除</a>
             </li>
         `,
         props: ['task'],
+        data: function() {
+            return {
+                editMode: false,
+            }
+        },
         methods: {
             remove: function() {
                 // remove という名前でイベントを発行する
                 this.$emit('remove');
-            }
+            },
+            edit: function() {
+                this.editMode = true;
+            },
+            fix: function() {
+                this.editMode = false;
+            },
         },
     })
 
